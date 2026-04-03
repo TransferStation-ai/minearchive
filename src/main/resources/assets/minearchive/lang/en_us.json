@@ -1,0 +1,13 @@
+{
+  "itemGroup.minearchive_tab": "Archive Figures",
+  "itemGroup.minearchive_tab_2": "Archive Enchanted Books",
+  "item.minearchive.kayoko": "Kayoko",
+  "item.minearchive.hina": "Hina",
+  "item.minearchive.lu": "Lu",
+  "item.minearchive.goon": "100kg",
+  "enchantment.minearchive.cat_attraction": "Cat Attraction",
+  "item.minearchive.kayoko.tooltip": "She doesn't want you to go through too much trouble for enchantments (when consumed, equipment has a chance to gain 1~10 enchantments)",
+  "item.minearchive.kayoko.enchant_hint": "She doesn't want you to go through too much trouble for potions (when consumed, has a chance to gain 1~2 buffs)",
+  "item.minearchive.kayoko.pity_mechanism": "You cannot die under the protection of the most reliable person",
+  "item.minearchive.kayoko.holding_effect": "When health is below 5%, a mysterious power will restore your health to full"
+}
