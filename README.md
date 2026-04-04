@@ -1,3 +1,6 @@
-What we encourage you to do, depending on the situation, is to ask questions and propose changes.
-When troubleshooting the problem, please make sure that your crash is not caused by this mod
-If you want to report problems, please submit a crash log.
+Depending on your situation, we encourage you to ask questions, report issues, or provide suggestions.
+
+When troubleshooting a problem, please try to confirm if the crash or issue is actually caused by this mod (for example, by testing with only this mod installed).
+
+If you need to report a problem, please always include the relevant crash log or error message. This helps us diagnose and solve your issue more quickly.
+
