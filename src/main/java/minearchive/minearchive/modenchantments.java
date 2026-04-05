@@ -1,4 +1,4 @@
-package minearchive;
+package minearchive.minearchive;
 
 import minearchive.item.catatt;
 import net.minecraft.world.item.enchantment.Enchantment;
