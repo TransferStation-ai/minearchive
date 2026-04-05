@@ -1,4 +1,4 @@
-package com.item;
+package minearchive.item;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
