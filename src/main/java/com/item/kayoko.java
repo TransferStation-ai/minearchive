@@ -225,7 +225,7 @@ public class kayoko extends Item {
 
         player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 255));
 
-        // 添加防火效果（5秒）
+        // 添加防火效果
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 255));
 
         // 在玩家位置播放效果粒子
@@ -252,6 +252,7 @@ public class kayoko extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         // 调用父类方法处理基础食物逻辑
+        //这里进行服务端判定是因为如果不做服务端判定的话，编译器和MC会出现一些奇奇怪怪的问题
         ItemStack result = super.finishUsingItem(stack, level, entity);
 
         // 只在服务器端执行效果给予逻辑
@@ -294,7 +295,7 @@ public class kayoko extends Item {
 
         return result;
     }
-
+//其实并非硬编码如果你点一下那4个东西，就会显现出原来的代码
     // 可选：添加工具提示
     @Override
     public void appendHoverText(ItemStack stack, Level level,
