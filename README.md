@@ -3,6 +3,6 @@ When troubleshooting a problem, please try to confirm if the crash or issue is a
 If you need to report a problem, please always include the relevant crash log or error message. This helps us diagnose and solve your issue more quickly.
 
 
-I think you should give me feedback questions.[issues](https://github.com/TransferStation-ai/minearchive/issues)
+I think what you should give me is feedback questions.[issues](https://github.com/TransferStation-ai/minearchive/issues)
 Don't ask me why I don't just produce 1.20.1, because the default branch is 1.20.1 by default.
 The reason I chose this license is thatit explicitly permits you to use my codein both closed-source and open-sourceprojects without needing to ask for mypermission.
