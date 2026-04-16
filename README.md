@@ -4,3 +4,4 @@ If you need to report a problem, please always include the relevant crash log or
 Don't ask me why I don't just produce 1.20.1, because the default branch is 1.20.1 by default.
 In fact, I really have nothing to say here.
 I just want people to use my project code as open source, not closed source.
+That is to say, I am the only one who is open source, while others are closed source. This is a situation that I do not expect.
