@@ -3,7 +3,7 @@ When troubleshooting a problem, please try to confirm if the crash or issue is a
 If you need to report a problem, please always include the relevant crash log or error message. This helps us diagnose and solve your issue more quickly.
 
 
-[issues](https://github.com/TransferStation-ai/minearchive/issues)
+[issues](https://github.com/TransferStation-ai/minearchive/issues)Upload the crash log here
 
 
 Don't ask me why I don't just produce 1.20.1, because the default branch is 1.20.1 by default.
