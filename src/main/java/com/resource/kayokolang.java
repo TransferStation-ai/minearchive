@@ -29,6 +29,7 @@ import java.util.function.Consumer;
 //实际这个代码没有做任何事情
 
 public class kayokolang implements RepositorySource {
+    //试图把一个资源包给到资源包列表
     private static final String LEGACY_PACK_DIR_NAME = "kayoko_universal";
     private static final String PACK_NAME = "minearchive_legacy_resources_pack";
     private final Pack legacyPack;
