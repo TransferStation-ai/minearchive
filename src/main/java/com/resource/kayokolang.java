@@ -50,6 +50,4 @@ public class kayokolang implements RepositorySource {
         consumer.accept(this.legacyPack);
     }
 
-    private class MOD_ID {
-    }
 }
