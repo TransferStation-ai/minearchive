@@ -14,6 +14,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class kayoko extends Item {
+    //这里用于编辑效果列表，按理说他应该引用存在的效果如果目标效果不存在，不知道会出些很奇妙的事情
+    //This is used to edit the list of effects, and it stands to reason that he should refer to the effects that exist, and if the target effect does not exist, I don't know if something wonderful will happen
     private static final List<MobEffect> BENEFICIAL_EFFECTS = Arrays.asList(
             MobEffects.MOVEMENT_SPEED,      // 速度
             MobEffects.DIG_SPEED,           // 急迫
@@ -33,10 +35,10 @@ public class kayoko extends Item {
             MobEffects.CONDUIT_POWER,       // 潮涌能量
             MobEffects.HERO_OF_THE_VILLAGE  // 村庄英雄
     );
-
+    // List of available enchantments (filters out curse enchantments)
     // 可用的附魔列表（过滤掉诅咒附魔）
     private static List<Enchantment> AVAILABLE_ENCHANTMENTS = null;
-
+    //Guaranteed counter: Records the number of times each player has not triggered an enchantment in a row
     // 保底计数器：记录每个玩家连续没有触发附魔的次数
     private static final Map<UUID, Integer> ENCHANTMENT_PITY_COUNTER = new HashMap<>();
 
@@ -50,20 +52,20 @@ public class kayoko extends Item {
                         .build())
                 .stacksTo(64)               // 最大堆叠64个（或保持原样）
         );
-
+        // Delay initializing the list of available enchantments
         // 延迟初始化可用附魔列表
         if (AVAILABLE_ENCHANTMENTS == null) {
             initAvailableEnchantments();
         }
     }
-
+    // initializeTheListOfAvailableEnchantments
     // 初始化可用附魔列表
     private void initAvailableEnchantments() {
         AVAILABLE_ENCHANTMENTS = BuiltInRegistries.ENCHANTMENT.stream()
                 .filter(enchantment -> !enchantment.isCurse())  // 排除诅咒附魔
                 .collect(Collectors.toList());
     }
-
+    //  Obtain a random enchantment
     // 获取随机附魔
     private Enchantment getRandomEnchantment(Random rand) {
         if (AVAILABLE_ENCHANTMENTS == null || AVAILABLE_ENCHANTMENTS.isEmpty()) {
@@ -71,15 +73,16 @@ public class kayoko extends Item {
         }
         return AVAILABLE_ENCHANTMENTS.get(rand.nextInt(AVAILABLE_ENCHANTMENTS.size()));
     }
-
+    // randomly enhance player backpack items
     // 随机增强玩家背包物品
     private void randomlyEnhancePlayerItem(Player player, Random rand) {
+        // Obtain an enchantable item in the player's backpack
         // 获取玩家背包中可附魔的物品
         List<ItemStack> enchantableItems = new ArrayList<>();
 
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack stack = player.getInventory().getItem(i);
-
+            // Only enchantable and durable items (weapons, tools, armor)
             // 只选择可附魔且有耐久的物品（武器、工具、盔甲）
             if (!stack.isEmpty() && stack.isEnchantable() && stack.getMaxDamage() > 0) {
                 enchantableItems.add(stack);
@@ -87,6 +90,7 @@ public class kayoko extends Item {
         }
 
         if (enchantableItems.isEmpty()) {
+            // If there are no enchantable items, try choosing other acceptable items
             // 如果没有可附魔的物品，尝试选择其他可接受的物品
             for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
                 ItemStack stack = player.getInventory().getItem(i);
@@ -97,12 +101,13 @@ public class kayoko extends Item {
         }
 
         if (enchantableItems.isEmpty()) {
-            return;  // 背包中没有可附魔的物品
+            return;  // There are no enchantable items in the backpack
+            // 背包中没有可附魔的物品
         }
-
+         // randomly select an item
         // 随机选择一个物品
         ItemStack targetStack = enchantableItems.get(rand.nextInt(enchantableItems.size()));
-
+        // Check if the item is enchanted
         // 检查物品是否已有附魔
         boolean hasEnchantments = EnchantmentHelper.getEnchantments(targetStack).size() > 0;
 
@@ -118,7 +123,7 @@ public class kayoko extends Item {
             }
         }
     }
-
+    // Adds random enchantments to items
     // 为物品添加随机附魔
     private void addRandomEnchantment(ItemStack stack, Random rand, int level) {
         int attempts = 0;
@@ -136,8 +141,8 @@ public class kayoko extends Item {
                 if (currentEnchantments.containsKey(enchantment)) {
                     // 已存在，提升等级
                     int currentLevel = currentEnchantments.get(enchantment);
-                    int newLevel = Math.min(5, currentLevel + 1);  // 最大等级限制为5
-                    currentEnchantments.put(enchantment, newLevel);
+                    int newLevel = Math.min(5, currentLevel + 1);  // 这里做判断的原因是我的世界最高附魔等级是5级并且如果一样的附魔被选中不应尝试重新附魔，而是应该升级附魔
+                    currentEnchantments.put(enchantment, newLevel);//The reason for the judgment here is that the maximum enchantment level in Minecraft is level 5, and if the same enchantment is selected, it should not be attempted to re-enchant, but should be upgraded
                     EnchantmentHelper.setEnchantments(currentEnchantments, stack);
                 } else {
                     // 检查与其他附魔的兼容性
@@ -171,7 +176,8 @@ public class kayoko extends Item {
             ItemStack stack = player.getInventory().getItem(i);
 
             if (!stack.isEmpty() && stack.isEnchantable()) {
-                // 随机决定给这个物品添加1-3个附魔
+                // 随机决定给这个物品添加附魔
+                // Randomly decide to enchant this item
                 int enchantmentCount = 3 + rand.nextInt(10);
 
                 for (int j = 0; j < enchantmentCount; j++) {
@@ -253,6 +259,8 @@ public class kayoko extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         // 调用父类方法处理基础食物逻辑
         //这里进行服务端判定是因为如果不做服务端判定的话，编译器和MC会出现一些奇奇怪怪的问题
+      // Call the parent method to handle the underlying food logic
+      //  The server-side decision here is because if the server-side decision is not made, the compiler and MC will have some strange problems
         ItemStack result = super.finishUsingItem(stack, level, entity);
 
         // 只在服务器端执行效果给予逻辑
@@ -295,8 +303,8 @@ public class kayoko extends Item {
 
         return result;
     }
-//其实并非硬编码如果你点一下那4个东西，就会显现出原来的代码
     // 可选：添加工具提示
+    //全版本都有
     @Override
     public void appendHoverText(ItemStack stack, Level level,
                                 List<net.minecraft.network.chat.Component> tooltip,
