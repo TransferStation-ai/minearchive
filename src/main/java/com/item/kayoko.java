@@ -1,4 +1,7 @@
 package com.item;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -104,7 +107,7 @@ public class kayoko extends Item {
             return;  // There are no enchantable items in the backpack
             // 背包中没有可附魔的物品
         }
-         // randomly select an item
+        // randomly select an item
         // 随机选择一个物品
         ItemStack targetStack = enchantableItems.get(rand.nextInt(enchantableItems.size()));
         // Check if the item is enchanted
@@ -221,29 +224,45 @@ public class kayoko extends Item {
             return;
         }
 
-        // 模拟不死图腾的效果
-        player.setHealth(1.0F);  // 恢复1点生命值
+        Level level = player.level();
+
+        // 关键：取消死亡状态
+        player.deathTime = 0;
+        player.setHealth(1.0F);
 
         // 清除所有负面效果
         player.removeAllEffects();
 
-        player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 800, 255));
+        // 添加标准不死图腾效果
+        player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1)); // 45秒再生I
+        player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1));   // 5秒吸收I
+        player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 0)); // 40秒防火
+        // 生成不死图腾粒子效果
+        player.level().playSound(
+                null,
+                player.getX(),
+                player.getY(),
+                player.getZ(),
+                net.minecraft.sounds.SoundEvents.TOTEM_USE,
+                net.minecraft.sounds.SoundSource.PLAYERS,
+                1.0F,
+                1.0F
+        );
+        for (int i = 0; i < 30; ++i) {
+            double offsetX = player.getRandom().nextGaussian() * 0.02;
+            double offsetY = player.getRandom().nextGaussian() * 0.02;
+            double offsetZ = player.getRandom().nextGaussian() * 0.02;
 
-        player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 255));
-
-        // 添加防火效果
-        player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 255));
-
-        // 在玩家位置播放效果粒子
-        Level level = player.level();
-        for(int i = 0; i < 20; ++i) {
-            double d0 = player.getRandom().nextGaussian() * 0.02;
-            double d1 = player.getRandom().nextGaussian() * 0.02;
-            double d2 = player.getRandom().nextGaussian() * 0.02;
-            // 这里可以添加粒子效果，但需要粒子系统支持
+            level.addParticle(
+                    ParticleTypes.TOTEM_OF_UNDYING,
+                    player.getX(),
+                    player.getY() + 1.0,
+                    player.getZ(),
+                    1,
+                    offsetX, offsetY
+            );
         }
     }
-
     // +++ 新增方法：检查玩家是否手持kayoko物品 +++
     public static boolean isPlayerHoldingKayoko(Player player) {
         if (player == null) return false;
@@ -259,8 +278,8 @@ public class kayoko extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         // 调用父类方法处理基础食物逻辑
         //这里进行服务端判定是因为如果不做服务端判定的话，编译器和MC会出现一些奇奇怪怪的问题
-      // Call the parent method to handle the underlying food logic
-      //  The server-side decision here is because if the server-side decision is not made, the compiler and MC will have some strange problems
+        // Call the parent method to handle the underlying food logic
+        //  The server-side decision here is because if the server-side decision is not made, the compiler and MC will have some strange problems
         ItemStack result = super.finishUsingItem(stack, level, entity);
 
         // 只在服务器端执行效果给予逻辑
@@ -307,19 +326,19 @@ public class kayoko extends Item {
     //全版本都有
     @Override
     public void appendHoverText(ItemStack stack, Level level,
-                                List<net.minecraft.network.chat.Component> tooltip,
-                                net.minecraft.world.item.TooltipFlag flag) {
+                                List< Component> tooltip,
+                                TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-        tooltip.add(net.minecraft.network.chat.Component.translatable("item.minearchive.kayoko.tooltip")
-                .withStyle(net.minecraft.ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.minearchive.kayoko.tooltip")
+                .withStyle(ChatFormatting.GRAY));
 
-        tooltip.add(net.minecraft.network.chat.Component.translatable("item.minearchive.kayoko.enchant_hint")
-                .withStyle(net.minecraft.ChatFormatting.DARK_PURPLE));
+        tooltip.add(Component.translatable("item.minearchive.kayoko.enchant_hint")
+                .withStyle(ChatFormatting.DARK_PURPLE));
 
-        tooltip.add(net.minecraft.network.chat.Component.translatable("item.minearchive.kayoko.pity_mechanism")
-                .withStyle(net.minecraft.ChatFormatting.DARK_GRAY, net.minecraft.ChatFormatting.ITALIC));
+        tooltip.add(Component.translatable("item.minearchive.kayoko.pity_mechanism")
+                .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 
-        tooltip.add(net.minecraft.network.chat.Component.translatable("item.minearchive.kayoko.holding_effect")
-                .withStyle(net.minecraft.ChatFormatting.GOLD));
+        tooltip.add(Component.translatable("item.minearchive.kayoko.holding_effect")
+                .withStyle(ChatFormatting.GOLD));
     }
-}
+    }
