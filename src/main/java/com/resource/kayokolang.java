@@ -20,7 +20,6 @@ public class kayokolang implements RepositorySource {
     private static final String LEGACY_PACK_DIR_NAME = "kayoko_universal";
     private static final String PACK_NAME = "minearchive_legacy_resources_pack";
     private final Pack legacyPack;
-    private Pack kayokolang;
     public kayokolang() {
         Pack.ResourcesSupplier supplier = name -> getLegacyPack();
         MutableComponent desc = Component.translatable("pack.minearchive.legacy_resources_pack.desc");
@@ -31,12 +30,12 @@ public class kayokolang implements RepositorySource {
                 Pack.Position.TOP, false, PackSource.BUILT_IN);
     }
 
-    private PathPackResources getLegacyPack() {
+    private @NotNull PathPackResources getLegacyPack() {
         IModFile file = ModList.get().getModFileById(minearchive.MODID).getFile();
         return new PathPackResources(file.getFileName(), true, file.getFilePath()) {
             @NotNull
             @Override
-            protected Path resolve(@NotNull String... paths) {
+            public Path resolve(@NotNull String... paths) {
                 String[] newPaths = new String[paths.length + 1];
                 newPaths[0] = LEGACY_PACK_DIR_NAME;
                 System.arraycopy(paths, 0, newPaths, 1, paths.length);
@@ -46,7 +45,7 @@ public class kayokolang implements RepositorySource {
     }
 
     @Override
-    public void loadPacks(Consumer<Pack> consumer) {
+    public void loadPacks(@NotNull Consumer<Pack> consumer) {
         consumer.accept(this.legacyPack);
     }
 

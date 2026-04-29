@@ -1,91 +1,92 @@
 package com.Eventlistening;
 
 import com.item.kayoko;
-import net.minecraft.core.particles.ParticleTypes;
+import com.minearchive.Config;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import static com.item.kayoko.triggerTotemEffect;
+import static com.minearchive.Config.BUILDER;
+import static com.minearchive.minearchive.MODID;
 
+@Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TotemEventHandler {
-
-    private static ServerLevel level;
-
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
-        // 只处理玩家死亡
-        if (!(event.getEntity() instanceof Player player)) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        // 关键修复：只有持有物品时才触发
+        if (!shouldTriggerTotem(player)) return;
+        // 新增：检查攻击者是否持有 hina 物品
+        Entity attacker = event.getSource().getEntity();
+        if (attacker instanceof LivingEntity livingAttacker) {
+            Item hinaItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(MODID, "hina"));
+            if (hinaItem != null && hinaItem != Items.AIR) {
+                ItemStack mainHand = livingAttacker.getMainHandItem();
+                ItemStack offHand = livingAttacker.getOffhandItem();
+                if (mainHand.is(hinaItem) || offHand.is(hinaItem)) {
+                    // 50% 概率导致死亡（不触发 totem）
+                    // 从配置读取概率
+                    double deathChance = BUILDER.getClass().getModifiers(); // 或 BUILDER.deathChance
+                    if (livingAttacker.getRandom().nextFloat() < deathChance) {
+                        return; // 直接返回，不取消死亡事件
+                    }
+                }
+            }
+        }
+        Level level = player.level();
+        // 关键：取消死亡状态
+        player.deathTime = 0;
+        player.setHealth(1.0F);
+        // 取消死亡事件
+        event.setCanceled(true);
+        // 清除所有负面效果
+        player.removeAllEffects();
+        // 触发不死图腾效果
+        triggerTotemEffect(player);
+        // 消耗物品并播放声音
+        consumeKayoko(player, level);
+
+    }
+    @SuppressWarnings("removal")
+    public static void consumeKayoko(Player player, Level level) {
+        // 修复：只在服务端执行物品消耗
+        if (level.isClientSide) return;
+
+        Item kayokoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(MODID, "kayoko"));
+        if (kayokoItem == null || kayokoItem == Items.AIR) {
             return;
         }
 
-        // 检查是否应该触发不死图腾效果（这里可以添加条件判断）
-        if (shouldTriggerTotem(player)) {
-            //不死图腾的粒子
-            for (int i = 0; i < 30; i++) {
-                double ox = player.getRandom().nextGaussian() * 0.02;
-                double oy = player.getRandom().nextGaussian() * 0.02;
-                double oz = player.getRandom().nextGaussian() * 0.02;
-
-                level.sendParticles(
-                        ParticleTypes.TOTEM_OF_UNDYING,
-                        player.getX(),
-                        player.getY() + 1.0,
-                        player.getZ(),
-                        1,
-                        ox, oy, oz,
-                        0.0
-                );
-            }
-        }
-            // 取消死亡事件
-            event.setCanceled(true);
-            // 清除所有负面效果
-            player.removeAllEffects();
-            // 触发不死图腾效果
-        triggerTotemEffect(player);
-            //用于播放不死图腾的声音
-        Kayoko(player);
-        }
-
-    @SuppressWarnings("removal")
-    public static void Kayoko(Player player) {
-        Item kayokoItem;
-        kayokoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation("kayoko"));
-        if (kayokoItem == null || kayokoItem == Items.AIR) {
-            return; // 物品未找到，不执行操作
-        }
-        //遍历玩家的背包里面能够更快地找到物品
         Inventory inventory = player.getInventory();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             ItemStack stack = inventory.getItem(i);
             if (stack.is(kayokoItem)) {
-                stack.shrink(1); // 减少一个物品
+                stack.shrink(1);
                 if (stack.isEmpty()) {
                     inventory.setItem(i, ItemStack.EMPTY);
                 }
-                break; // 只移除一个，找到后立即退出循环
+                break;
             }
         }
     }
-
     private static boolean shouldTriggerTotem(Player player) {
-        boolean isPlayerHoldingKayoko;
-            if (player == null) {
-                return false;
-            }
-            // 检查主手和副手
-            ItemStack mainHand = player.getMainHandItem();
-            ItemStack offHand = player.getOffhandItem();
+        if (player == null) return false;
 
-            return mainHand.getItem() instanceof kayoko || offHand.getItem() instanceof kayoko;
-        }
+        ItemStack mainHand = player.getMainHandItem();
+        ItemStack offHand = player.getOffhandItem();
+
+        // 检查是否持有 kayoko 物品
+        return mainHand.getItem() instanceof kayoko || offHand.getItem() instanceof kayoko;
+    }
 }
-

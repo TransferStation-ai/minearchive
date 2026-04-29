@@ -144,7 +144,7 @@ public class kayoko extends Item {
                 if (currentEnchantments.containsKey(enchantment)) {
                     // 已存在，提升等级
                     int currentLevel = currentEnchantments.get(enchantment);
-                    int newLevel = Math.min(5, currentLevel + 1);  // 这里做判断的原因是我的世界最高附魔等级是5级并且如果一样的附魔被选中不应尝试重新附魔，而是应该升级附魔
+                    int newLevel = Math.min(5, currentLevel + 1);  // 这里做判断的原因是我的世界最高附魔等级是5级并且如果一样的附魔应被……选中尝试重新附魔，而是应该升级附魔
                     currentEnchantments.put(enchantment, newLevel);//The reason for the judgment here is that the maximum enchantment level in Minecraft is level 5, and if the same enchantment is selected, it should not be attempted to re-enchant, but should be upgraded
                     EnchantmentHelper.setEnchantments(currentEnchantments, stack);
                 } else {
@@ -225,29 +225,6 @@ public class kayoko extends Item {
         }
 
         Level level = player.level();
-
-        // 关键：取消死亡状态
-        player.deathTime = 0;
-        player.setHealth(1.0F);
-
-        // 清除所有负面效果
-        player.removeAllEffects();
-
-        // 添加标准不死图腾效果
-        player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1)); // 45秒再生I
-        player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1));   // 5秒吸收I
-        player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 0)); // 40秒防火
-        // 生成不死图腾粒子效果
-        player.level().playSound(
-                null,
-                player.getX(),
-                player.getY(),
-                player.getZ(),
-                net.minecraft.sounds.SoundEvents.TOTEM_USE,
-                net.minecraft.sounds.SoundSource.PLAYERS,
-                1.0F,
-                1.0F
-        );
         for (int i = 0; i < 30; ++i) {
             double offsetX = player.getRandom().nextGaussian() * 0.02;
             double offsetY = player.getRandom().nextGaussian() * 0.02;
