@@ -1,6 +1,7 @@
 package com.Eventlistening;
 
 import com.item.kayoko;
+import com.minearchive.Config;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import static com.item.kayoko.triggerTotemEffect;
+import static com.minearchive.Config.BUILDER;
 import static com.minearchive.minearchive.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -34,7 +36,9 @@ public class TotemEventHandler {
                 ItemStack offHand = livingAttacker.getOffhandItem();
                 if (mainHand.is(hinaItem) || offHand.is(hinaItem)) {
                     // 50% 概率导致死亡（不触发 totem）
-                    if (livingAttacker.getRandom().nextFloat() < 0.5f) {
+                    // 从配置读取概率
+                    double deathChance = BUILDER.getClass().getModifiers(); // 或 BUILDER.deathChance
+                    if (livingAttacker.getRandom().nextFloat() < deathChance) {
                         return; // 直接返回，不取消死亡事件
                     }
                 }
