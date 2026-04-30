@@ -29,11 +29,12 @@ public  class  hina extends Item {
                         .saturationMod(2f)      // 保持的2点饱和度
                         .alwaysEat()            // 随时可吃
                         .build())
-            .stacksTo(32)               // 最大堆叠32个
+            .stacksTo(64)               // 最大堆叠32个
         );
 
 }
 /*
+  The following content may be related to some optimization modules that are incompatible, please report them in time
     后面的内容可能与一些优化模组不兼容相关的报错请及时报告
     */
 
@@ -56,11 +57,15 @@ private static final Set<Player> HINA_HOLDERS = ConcurrentHashMap.newKeySet();
     }
 
     // 检测玩家是否手持Hina物品（主手+副手）
+    //检测玩家是否手持Hina物品（主手+副手）
     private static boolean isHoldingHina(Player player) {
         return isHina(player.getMainHandItem()) || isHina(player.getOffhandItem());
     }
 
     // 判断物品是否为Hina物品（需确保Hinam类存在）
+    //但这个文件本身就是Hinam类所以AI这个注释有点和意味
+    //Determine whether the item is a Hina item (make sure that the Hinam type exists)
+    //But this file itself is a Kinam class, so the AI annotation is a bit meaningful
     private static boolean isHina(ItemStack stack) {
         return stack.getItem() instanceof hina;
     }

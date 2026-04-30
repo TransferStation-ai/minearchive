@@ -27,7 +27,7 @@ public class goon extends Item {
     // 基础半径
     private static final int BASE_RADIUS = 5;
     // 最大半径
-    private static final int MAX_RADIUS = 15;
+    private static final int MAX_RADIUS = 1024;
     // 高度系数 - 每10格高度增加1格半径
     private static final float HEIGHT_MULTIPLIER = 0.1f;
     // 最小高度（Y坐标）
@@ -276,3 +276,5 @@ public class goon extends Item {
                 .withStyle(ChatFormatting.GRAY));
 }
 }
+
+
