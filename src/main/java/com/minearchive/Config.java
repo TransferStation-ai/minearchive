@@ -11,7 +11,7 @@ public class Config {
     //代码中的允许值应该是0~1
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     private static final ForgeConfigSpec.DoubleValue MAGIC_NUMBER = BUILDER.comment("When an attacker holding Hina attacks a player holding Kayoko, there is a chance that Kayoko's immortal totem effect will be destroyed").defineInRange("hina_kayoko", 0.5, 0, 1);
-    static final ForgeConfigSpec SPEC = BUILDER.build();
+
 
     public static final ForgeConfigSpec.DoubleValue FOOL= BUILDER.comment("The probability of being cared for when a player holds an ARU item").defineInRange("magicNumber", 0.5, 0, 1);
 
@@ -32,4 +32,6 @@ public class Config {
     // 向上击飞的额外力度
     public static final ForgeConfigSpec.DoubleValue UPWARD_FORCE= BUILDER.comment("Usually this value results in the extra height at which the item flies").defineInRange("extraforcetoflyupwards", 0.8, 0, 1024);
 
+
+    static final ForgeConfigSpec SPEC = BUILDER.build();
 }
