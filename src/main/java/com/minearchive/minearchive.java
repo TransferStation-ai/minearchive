@@ -1,10 +1,7 @@
 package com.minearchive;
-import com.Eventlistening.TotemEventHandler;
-import com.item.catatt;
-import com.item.hina;
+import com.eventlistening.totemeventHandler;
+import com.item.*;
 import net.minecraft.world.item.Item;
-import com.item.goon;
-import com.item.kayoko;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -37,9 +34,12 @@ import static com.item.catatt.CatAttractionHandler.CAT_ATTRACTION;
 @Mod(minearchive.MODID)
 public class minearchive {
 
-        // Define mod id in a common place for everything to reference
-    //Efine 模组 ID 放在一个通用的地方，供所有物品参考
-        public static final String MODID = "minearchive";
+        // You put your mod ID in this to allow some class files to define the mod location more quickly
+    //你把你的模组ID放进这里面以便让一些类文件能够更快定义模组位置
+    //There's a cold joke that when I was commenting on this, I accidentally commented out my own mod ID
+    //Just like that //     public static final String MODID = "minearchive";
+
+    public static final String MODID = "minearchive";
     // Directly reference a slf4j logger
     //直接引用slf4j日志机
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -59,18 +59,19 @@ public class minearchive {
     public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ITEMS.register("kayoko_block", () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties()));
     //吃我一招注册之墙
     //Eat my trick registration wall
-    public static final RegistryObject<Item> EXAMPLE_ITEM
-            = ITEMS.register("kayoko", kayoko::new);
-    public static final RegistryObject<Item> LU
-            = ITEMS.register("lu", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEat().nutrition(1).saturationMod(2f).build())));
+    public static final RegistryObject<Item> EXAMPLE_ITEM //这里填的时候记得填全大写，这里因为是早期忘记修了
+            = ITEMS.register("kayoko", kayoko::new); //这里的参数是有两，一个是方法名和一个物品注册名但最好的情况是物品注册名和方法名都是小写跟同一个名字
     public static final RegistryObject<Item> GNT
             = ITEMS.register("goon", goon::new);
     public static final RegistryObject<Item>  NINA
             = ITEMS.register("hina", hina::new);
+    public static final RegistryObject<Item>  MUTSUKI
+            = ITEMS.register("mutsuki", mutsuki::new);
+    public static final RegistryObject<Item>  ARU
+            = ITEMS.register("aru", aru::new);
 
     public minearchive() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
         // Register the commonSetup method for modloading
         //注册 commonSetup 方法进行 modloading
         modEventBus.addListener(this::commonSetup);
@@ -93,6 +94,7 @@ public class minearchive {
         catatt.CatAttractionHandler.ENCHANTMENTS.register(modEventBus);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         //注册我们模组的ForgeConfigSpec，这样Forge就能帮我们创建并加载配置文件
+        //noinspection removal
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
@@ -109,6 +111,8 @@ public class minearchive {
 
 
     }
+    //看到此注释请自己去steam买个超级地球 虽然这不是强迫你就是
+    //If you see this comment, please go to Steam to buy a Super Earth yourself Although this is not forcing you to do
     //非法广播：创造物品标签栏列表
     //Illegal broadcasting: Create a list of item tags
     public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register(
@@ -122,11 +126,14 @@ public class minearchive {
                         if (NINA != null) {
                             output.accept(NINA.get());
                         }
-                        if (LU != null) {
-                            output.accept(LU.get());
-                        }
                         if (GNT != null) {
                             output.accept(GNT.get());
+                        }
+                        if (MUTSUKI != null) {
+                            output.accept(MUTSUKI.get());
+                        }
+                        if (ARU != null) {
+                            output.accept(ARU.get());
                         }
                     })
                     .build()
@@ -155,13 +162,15 @@ public class minearchive {
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     //你可以使用 SubscribeEvent，让事件总线发现调用的方法
+    //事实是你必须得使用 @Mod.EventBusSubscriber来让类文件，无需在主类调用，就能生效
+    //The fact is that you have to use @Mod.EventBusSubscriber to make the class file take effect without having to call it in the main class
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         //服务器开始时做点什么
         //也许我可以在这里定义服务器事件
         LOGGER.info("HELLO from server starting");
-        MinecraftForge.EVENT_BUS.register(TotemEventHandler.class);
+        MinecraftForge.EVENT_BUS.register(totemeventHandler.class);
     }
 
 

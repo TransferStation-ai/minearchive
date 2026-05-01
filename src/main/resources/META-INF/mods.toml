@@ -1,21 +1,19 @@
 modLoader="javafml"
 loaderVersion="[47,)"
-license="MIT"
+license="Apache-2.0"
 
 [[mods]]
 modId="minearchive"
 version="1.0"
 displayName="MineArchive"
 main="com.anthonyhilyard.minearchive.MineArchiveMod"
-displayURL="https://modrinth.com/mod/minearchive"
-updateJSONURL="https://modrinth.com/mod/minearchive"
+displayURL="https://github.com/TransferStation-ai/minearchive"
 logoFile="icon.png"
 authors="Creator:Transit Station Laodeng        Chat in the official group:910583060"
 description="Minecraft x Blue Archive."
 
 [[mods.mixinConfigs]]
 config="minearchive.mixins.json"
-
 [[dependencies.minearchive]]
 	modId="forge"
 	mandatory=true
