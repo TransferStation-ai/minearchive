@@ -1,5 +1,6 @@
 package com.item;
 
+import com.minearchive.Config;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -22,20 +23,33 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.minearchive.Config.*;
+
 public class goon extends Item {
     private static final Random random = new Random();
-    // 基础半径
-    private static final int BASE_RADIUS = 5;
-    // 最大半径
-    private static final int MAX_RADIUS = 1024;
-    // 高度系数 - 每10格高度增加1格半径
-    private static final float HEIGHT_MULTIPLIER = 0.1f;
-    // 最小高度（Y坐标）
-    private static final int MIN_HEIGHT = 64;
-    // 击飞边缘方块的力度
-    private static final double LAUNCH_FORCE = 1.5;
-    // 向上击飞的额外力度
-    private static final double UPWARD_FORCE = 0.8;
+    private static Double BASE_RADIUS() {
+        return Double.valueOf(Config.BASE_RADIUS.get());
+    }
+
+    private static int MAX_RADIUS() {
+        return MAX_RADIUS.get();
+    }
+
+    private static double SPEED_MULTIPLIER() {
+        return Config.SPEED_MULTIPLIER.get();
+    }
+//
+    private static double MIN_SPEED() {
+        return Config.MIN_SPEED.get();
+    }
+
+    private static double LAUNCH_FORCE() {
+        return LAUNCH_FORCE.get();
+    }
+
+    private static double UPWARD_FORCE() {
+        return UPWARD_FORCE.get();
+    }
 
     public goon(Properties properties) {
         super(properties);
@@ -55,70 +69,62 @@ public class goon extends Item {
                     player.getOffhandItem().getItem() == this;
 
             if (inHand && player.tickCount % 2 == 0) {
-                processHammerEffect(level, player);
-                killEntitiesInRadius(level, player, calculateRadiusBasedOnHeight(player));
+                int radius = calculateRadiusBasedOnFallSpeed(player);
+                processHammerEffect(level, player, radius);
+                killEntitiesInRadius(level, player, radius);
             }
         }
     }
-    private void processHammerEffect(Level level, Player player) {
-        // 计算动态半径（基于高度）
-        int radius = calculateRadiusBasedOnHeight(player);
 
-        // 获取所有需要处理的方块位置
+    private int calculateRadiusBasedOnFallSpeed(Player player) {
+        double fallSpeed = Math.abs(player.getDeltaMovement().y);
+        
+        if (fallSpeed < Config.MIN_SPEED.get()) {
+            return BASE_RADIUS.get();
+        }
+        
+        int speedBonus = (int)(fallSpeed * SPEED_MULTIPLIER.get());
+        int radius = BASE_RADIUS.get() + speedBonus;
+        
+        return Math.min(radius, Config.MAX_RADIUS.get());
+    }
+
+    private void processHammerEffect(Level level, Player player, int radius) {
         List<BlockPos> affectedPositions = getAffectedPositions(player, radius);
 
-        // 处理方块
         for (BlockPos pos : affectedPositions) {
             if (!level.isLoaded(pos)) continue;
 
             BlockState state = level.getBlockState(pos);
             Block block = state.getBlock();
 
-            // 检查是否是有效方块
             if (isValidBlock(state, level, pos)) {
-                // 计算到玩家的距离
                 double distance = Math.sqrt(
                         Math.pow(pos.getX() - player.getX(), 2) +
                                 Math.pow(pos.getY() - player.getY(), 2) +
                                 Math.pow(pos.getZ() - player.getZ(), 2)
                 );
 
-                // 判断是否在边缘区域
                 boolean isEdgeBlock = distance > radius - 1.5;
 
                 if (isEdgeBlock) {
-                    // 边缘方块 - 击飞
                     launchBlock(level, pos, state, player);
                 } else {
-                    // 内部方块 - 直接破坏
                     level.destroyBlock(pos, true);
                 }
             }
         }
 
-        // 轻微减少饥饿值
         int foodLevel = player.getFoodData().getFoodLevel();
         if (foodLevel > 0) {
-            player.getFoodData().setFoodLevel((int) (foodLevel - 0.000000000000000000000000000001));
+            player.getFoodData().setFoodLevel((int) (foodLevel - 1));
         }
     }
-    private int calculateRadiusBasedOnHeight(Player player) {
-        double playerY = player.getY();
-        int heightRadiusBonus = 0;
 
-        if (playerY > MIN_HEIGHT) {
-            // 高度越高，半径增加越大
-            heightRadiusBonus = (int) ((playerY - MIN_HEIGHT) * HEIGHT_MULTIPLIER);
-        }
-
-        int radius = BASE_RADIUS + heightRadiusBonus;
-        return Math.min(radius, MAX_RADIUS);
-    }
     private List<BlockPos> getAffectedPositions(Player player, int radius) {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos center = player.blockPosition();
 
-        // 球形区域遍历
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
@@ -130,24 +136,18 @@ public class goon extends Item {
         }
         return positions;
     }
-    /**
-     * 检查是否是有效方块
-     */
+
     private boolean isValidBlock(BlockState state, Level level, BlockPos pos) {
         return !state.isAir() &&
                 state.getDestroySpeed(level, pos) >= 0 &&
                 state.getBlock().defaultDestroyTime() > 0;
     }
-    /**
-     * 击飞方块
-     */
+
     private void launchBlock(Level level, BlockPos pos, BlockState state, Player player) {
         if (level.isClientSide) return;
 
-        // 确保是服务器端
         ServerLevel serverLevel = (ServerLevel) level;
 
-        // 为每个掉落物添加击飞效果
         List<ItemStack> drops = Block.getDrops(
                 state,
                 serverLevel,
@@ -166,21 +166,18 @@ public class goon extends Item {
                     drop
             );
 
-            // 计算击飞方向（从玩家指向方块）
             double dx = pos.getX() - player.getX();
             double dy = pos.getY() - player.getY();
             double dz = pos.getZ() - player.getZ();
             double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
             if (distance > 0) {
-                // 标准化方向向量
                 dx /= distance;
                 dy /= distance;
                 dz /= distance;
 
-                // 应用击飞力度，并增加向上的分量
-                double horizontalForce = random.nextDouble() * 0.2 + LAUNCH_FORCE;
-                double upwardForce = random.nextDouble() * 0.2 + UPWARD_FORCE;
+                double horizontalForce = random.nextDouble() * 0.2 + LAUNCH_FORCE.get();
+                double upwardForce = random.nextDouble() * 0.2 + UPWARD_FORCE.get();
 
                 itemEntity.setDeltaMovement(
                         dx * horizontalForce + random.nextGaussian() * 0.1,
@@ -188,42 +185,30 @@ public class goon extends Item {
                         dz * horizontalForce + random.nextGaussian() * 0.1
                 );
 
-                // 设置物品实体的生命周期
                 itemEntity.setDefaultPickUpDelay();
-
-                // 生成物品实体
                 level.addFreshEntity(itemEntity);
             }
         }
 
-        // 移除原始方块
         level.removeBlock(pos, false);
     }
 
-    /**
-     * 获取当前效果半径（用于调试或显示）
-     */
     public static int getCurrentRadius(Player player) {
-        double playerY = player.getY();
-        int heightRadiusBonus = 0;
-
-        if (playerY > MIN_HEIGHT) {
-            heightRadiusBonus = (int) ((playerY - MIN_HEIGHT) * HEIGHT_MULTIPLIER);
+        double fallSpeed = Math.abs(player.getDeltaMovement().y);
+        if (fallSpeed < MIN_SPEED.get()) {
+            return BASE_RADIUS.get();
         }
-
-        int radius = BASE_RADIUS + heightRadiusBonus;
-        return Math.min(radius, MAX_RADIUS);
+        int speedBonus = (int)(fallSpeed * SPEED_MULTIPLIER.get());
+        int radius = BASE_RADIUS.get() + speedBonus;
+        return Math.min(radius, MAX_RADIUS.get());
     }
-    /**
-     * 杀死球形范围内的所有生物
-     */
+
     private void killEntitiesInRadius(Level level, Player player, int radius) {
         if (level.isClientSide) return;
         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 254));
-        // 获取玩家位置
+
         Vec3 playerPos = player.position();
 
-        // 获取范围内的所有实体
         List<Entity> entities = level.getEntities(null,
                 new AABB(
                         playerPos.x - radius, playerPos.y - radius, playerPos.z - radius,
@@ -232,28 +217,21 @@ public class goon extends Item {
         );
 
         for (Entity entity : entities) {
-            // 排除玩家自身
             if (entity == player) continue;
 
-            // 检查是否是生物（包含怪物、动物等）
             if (entity instanceof LivingEntity) {
                 LivingEntity livingEntity = (LivingEntity) entity;
-
-                // 计算到玩家的距离
                 double distance = playerPos.distanceTo(livingEntity.position());
 
-                // 只在球形范围内生效
                 if (distance <= radius) {
-                    // 对生物造成伤害
                     livingEntity.hurt(level.damageSources().playerAttack(player), Float.MAX_VALUE);
 
-                    // 可选的击飞效果
-                    if (distance > radius - 1.5) { // 边缘生物
+                    if (distance > radius - 1.5) {
                         Vec3 direction = livingEntity.position()
                                 .subtract(playerPos)
                                 .normalize()
-                                .scale(LAUNCH_FORCE)
-                                .add(0, UPWARD_FORCE, 0);
+                                .scale(LAUNCH_FORCE.get())
+                                .add(0, UPWARD_FORCE.get(), 0);
 
                         livingEntity.setDeltaMovement(
                                 direction.x + random.nextGaussian() * 0.1,
@@ -266,7 +244,7 @@ public class goon extends Item {
             }
         }
     }
-    //全版本都有
+    //当此物品被选中时在MC的物品显示里的提示
     @Override
     public void appendHoverText(ItemStack stack, Level level,
                                 List<Component> tooltip,
@@ -274,7 +252,5 @@ public class goon extends Item {
         super.appendHoverText(stack, level, tooltip, flag);
         tooltip.add(Component.translatable("item.minearchive.goon.tooltip")
                 .withStyle(ChatFormatting.GRAY));
+    }
 }
-}
-
-
