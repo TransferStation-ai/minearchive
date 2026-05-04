@@ -10,3 +10,10 @@ Don't ask me why I don't just produce 1.20.1, because the default branch is 1.20
 The reason I chose this license is thatit explicitly permits you to use my codein both closed-source and open-sourceprojects without needing to ask for mypermission
 
 
+---------------------------------------------------------------
+根据您的具体情况我们鼓励您提出新的问题以及一些建议
+在报告问题的同时请排查，是否真的是本模组问题
+
+把崩溃日志提交在[这里](https://github.com/TransferStation-ai/minearchive/issues)
+
+好吧，其实我自己也不知道这里应该写些什么
