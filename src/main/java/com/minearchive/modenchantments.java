@@ -11,5 +11,5 @@ public class modenchantments {
             DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, "minearchive"); // "minearchive" 是模组ID
 
     public static final RegistryObject<Enchantment> CAT_ATTRACTION =
-            ENCHANTMENTS.register("cat_attraction", () -> new catatt()); // 假设 catatt 是自定义附魔类
+            ENCHANTMENTS.register("cat_attraction", () -> new catatt());
 }

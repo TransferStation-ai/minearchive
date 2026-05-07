@@ -19,6 +19,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +62,7 @@ public class goon extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
+    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slot, isSelected);
 
         if (!level.isClientSide && entity instanceof Player) {
@@ -78,7 +80,8 @@ public class goon extends Item {
 
     private int calculateRadiusBasedOnFallSpeed(Player player) {
         double fallSpeed = Math.abs(player.getDeltaMovement().y);
-        
+        //添加空值保护以防止player也是空的情况
+        //Add null protection to prevent cases where the player is also empty
         if (fallSpeed < Config.MIN_SPEED.get()) {
             return BASE_RADIUS.get();
         }
@@ -90,6 +93,11 @@ public class goon extends Item {
     }
 
     private void processHammerEffect(Level level, Player player, int radius) {
+        if (level instanceof ServerLevel serverLevel &&
+                !serverLevel.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOENTITYDROPS)) {
+            return; // 当doEntityDrops这个世界规则状态为关闭时则不执行后面的破坏
+            // When the doEntityDrops world rule state is closed, subsequent breaks are not executed
+        }
         List<BlockPos> affectedPositions = getAffectedPositions(player, radius);
 
         for (BlockPos pos : affectedPositions) {
@@ -117,23 +125,21 @@ public class goon extends Item {
 
         int foodLevel = player.getFoodData().getFoodLevel();
         if (foodLevel > 0) {
-            player.getFoodData().setFoodLevel((int) (foodLevel - 1));
+            player.getFoodData().setFoodLevel(foodLevel - 1);
         }
     }
 
     private List<BlockPos> getAffectedPositions(Player player, int radius) {
         List<BlockPos> positions = new ArrayList<>();
         BlockPos center = player.blockPosition();
+        BlockPos min = center.offset(-radius, -radius, -radius);
+        BlockPos max = center.offset(radius, radius, radius);
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    if (x * x + y * y + z * z <= radius * radius) {
-                        positions.add(center.offset(x, y, z));
-                    }
-                }
+        BlockPos.betweenClosed(min, max).forEach(pos -> {
+            if (center.distSqr(pos) <= (long) radius * radius) {
+                positions.add(pos.immutable());
             }
-        }
+        });
         return positions;
     }
 
@@ -246,9 +252,9 @@ public class goon extends Item {
     }
     //当此物品被选中时在MC的物品显示里的提示
     @Override
-    public void appendHoverText(ItemStack stack, Level level,
-                                List<Component> tooltip,
-                                TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, Level level,
+                                @NotNull List<Component> tooltip,
+                                @NotNull TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         tooltip.add(Component.translatable("item.minearchive.goon.tooltip")
                 .withStyle(ChatFormatting.GRAY));

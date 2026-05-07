@@ -18,13 +18,12 @@ public class Config {
     //以下配置的允许值都是1024但客户端请不要将其设置到256以上的值可能导致很卡
     // The maximum allowed values for the following configurations are all 1024
   //  However, the client should not adjust this value to a value of about 256 or above
-
  // 基础半径
     public static final ForgeConfigSpec.IntValue BASE_RADIUS= BUILDER.comment("The base radius of the goon when performing sabotage missions").defineInRange("goonbaseradius", 5, 0, 1024);
     // 最大半径
     public static final ForgeConfigSpec.IntValue MAX_RADIUS= BUILDER.comment("Normally, the base radius is limited by the maximum radius, so don't set the maximum radius to a larger value as well").defineInRange("goonMaximumRadius", 128, 0, 1024);
-    // 速度转半径系数
-    public static final ForgeConfigSpec.IntValue SPEED_MULTIPLIER= BUILDER.comment("Added in the 3.0 beta").defineInRange("goonVelocitytoblockradiuscoefficient", 15, 0, 1024);
+    // 速度转半径系数 由于这个东西会在一定程度上导致最大半径的限制失效，所以默认值为1
+    public static final ForgeConfigSpec.IntValue SPEED_MULTIPLIER= BUILDER.comment("This thing may invalidate the limit of the maximum radius to some extent, so the default value is 1.").defineInRange("goonVelocitytoblockradiuscoefficient", 1, 0, 1024);
     // 最小触发速度
     public static final ForgeConfigSpec.DoubleValue MIN_SPEED= BUILDER.comment("Minimum trigger speed This thing should be enabled when the fall speed is greater than the minimum speed").defineInRange("goonMinimumtriggerspeed", 0.5, 0, 1024);
     // 击飞边缘方块的力度
