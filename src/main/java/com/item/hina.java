@@ -16,10 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import static com.minearchive.minearchive.MODID;
-
-
-
-
+//这里忘记提到了hina既可以用于吃也可以用于驱散怪物和反制kayoko
+//I forgot to mention here that hina can be used both for eating and for dispeling monsters and countering kayoko
 @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public  class  hina extends Item {
     public  hina () {

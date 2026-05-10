@@ -3,7 +3,6 @@ import com.eventlistening.totemeventHandler;
 import com.item.*;
 import net.minecraft.world.item.Item;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
@@ -30,6 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 import static com.item.catatt.CatAttractionHandler.CAT_ATTRACTION;
+import static net.minecraft.client.Minecraft.getInstance;
 
 @Mod(minearchive.MODID)
 public class minearchive {
@@ -94,7 +94,6 @@ public class minearchive {
         catatt.CatAttractionHandler.ENCHANTMENTS.register(modEventBus);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         //注册我们模组的ForgeConfigSpec，这样Forge就能帮我们创建并加载配置文件
-        //noinspection removal
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
@@ -184,7 +183,7 @@ public class minearchive {
         public static void onClientSetup(FMLClientSetupEvent event) {
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            LOGGER.info("MINECRAFT NAME >> {}", getInstance().getUser().getName());
         }
     }
 
