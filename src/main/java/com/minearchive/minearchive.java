@@ -28,7 +28,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
-import static com.item.catatt.CatAttractionHandler.CAT_ATTRACTION;
+import static com.item.Catatt.CatAttractionHandler.CAT_ATTRACTION;
 import static net.minecraft.client.Minecraft.getInstance;
 
 @Mod(minearchive.MODID)
@@ -60,15 +60,17 @@ public class minearchive {
     //吃我一招注册之墙
     //Eat my trick registration wall
     public static final RegistryObject<Item> EXAMPLE_ITEM //这里填的时候记得填全大写，这里因为是早期忘记修了
-            = ITEMS.register("kayoko", kayoko::new); //这里的参数是有两，一个是方法名和一个物品注册名但最好的情况是物品注册名和方法名都是小写跟同一个名字
+            = ITEMS.register("kayoko", Kayoko::new); //这里的参数是有两，一个是方法名和一个物品注册名但最好的情况是物品注册名和方法名都是小写跟同一个名字
     public static final RegistryObject<Item> GNT
-            = ITEMS.register("goon", goon::new);
+            = ITEMS.register("goon", Goon::new);
     public static final RegistryObject<Item>  NINA
-            = ITEMS.register("hina", hina::new);
+            = ITEMS.register("hina", Hina::new);
     public static final RegistryObject<Item>  MUTSUKI
-            = ITEMS.register("mutsuki", mutsuki::new);
+            = ITEMS.register("mutsuki", Mutsuki::new);
     public static final RegistryObject<Item>  ARU
-            = ITEMS.register("aru", aru::new);
+            = ITEMS.register("Aru", Aru::new);
+    public static final RegistryObject<Item>  HARUKA
+            = ITEMS.register("haruka", Haruka::new);
 
     public minearchive() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -91,7 +93,7 @@ public class minearchive {
         // Register the item to a creative tab
         //将该物品注册到创意标签页
         modEventBus.addListener(this::addCreative);
-        catatt.CatAttractionHandler.ENCHANTMENTS.register(modEventBus);
+        Catatt.CatAttractionHandler.ENCHANTMENTS.register(modEventBus);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         //注册我们模组的ForgeConfigSpec，这样Forge就能帮我们创建并加载配置文件
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -133,6 +135,9 @@ public class minearchive {
                         }
                         if (ARU != null) {
                             output.accept(ARU.get());
+                        }
+                        if (HARUKA != null) {
+                            output.accept(HARUKA.get());
                         }
                     })
                     .build()

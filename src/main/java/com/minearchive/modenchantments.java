@@ -1,6 +1,6 @@
-package minearchive;
+package com.minearchive;
 
-import com.item.catatt;
+import com.item.Catatt;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -11,5 +11,5 @@ public class modenchantments {
             DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, "minearchive"); // "minearchive" 是模组ID
 
     public static final RegistryObject<Enchantment> CAT_ATTRACTION =
-            ENCHANTMENTS.register("cat_attraction", () -> new catatt());
+            ENCHANTMENTS.register("cat_attraction", Catatt::new);
 }

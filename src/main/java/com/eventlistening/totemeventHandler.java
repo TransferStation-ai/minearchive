@@ -1,6 +1,6 @@
 package com.eventlistening;
 
-import com.item.kayoko;
+import com.item.Kayoko;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,14 +14,17 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-import static com.item.kayoko.triggerTotemEffect;
+
+import java.io.IOException;
+
+import static com.item.Kayoko.triggerTotemEffect;
 import static com.minearchive.Config.BUILDER;
 import static com.minearchive.minearchive.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class totemeventHandler {
     @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event) {
+    public static void onPlayerDeath(LivingDeathEvent event) throws IOException {
         if (!(event.getEntity() instanceof Player player)) return;
 
         // 关键修复：只有持有物品时才触发
@@ -86,6 +89,6 @@ public class totemeventHandler {
         ItemStack offHand = player.getOffhandItem();
 
         // 检查是否持有 kayoko 物品
-        return mainHand.getItem() instanceof kayoko || offHand.getItem() instanceof kayoko;
+        return mainHand.getItem() instanceof Kayoko || offHand.getItem() instanceof Kayoko;
     }
 }
